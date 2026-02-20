@@ -1,0 +1,376 @@
+\documentclass{article}
+\usepackage[margin=0.5in,landscape]{geometry}
+\usepackage{stix2}
+\usepackage{multicol}
+\usepackage{xcolor}
+
+\pagestyle{empty}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\usepackage{siunitx}
+
+\usepackage{verbatim}
+
+\newenvironment{basic}{\comment}{\endcomment}
+
+
+\usepackage{listings}
+\lstset{language=[LaTeX]TeX,
+keepspaces=true,
+basicstyle=\color{blue!75!black}\tt,% 
+% macros
+morekeywords={addplot,draw,pgfplotsset,tikzexternalize,
+tikzsetexternalprefix,tikzsetnextfilename,usetikzlibrary},
+keywordstyle=\color{blue!50!green},
+columns=flexible, % prevents listings from adding extra space between letters
+commentstyle=\color{red!45!black},
+aboveskip=0pt,
+belowskip=\medskipamount,
+moredelim=[is][\itshape\color{gray}]{"}{"},
+literate=<{$\langle$}{1} >{$\rangle$}{1},
+xleftmargin=10pt
+}
+\lstMakeShortInline"
+
+\usepackage{relsize}
+\newcommand{\code}[1]{{\relscale{1.1}\tt\color{blue!75!black}#1}}
+
+\lstnewenvironment{latex}[1][]{\lstset{,#1}}{}
+
+\usepackage{savetrees}
+\titlespacing{\section}
+  {0pt}% left
+  {4pt}% before
+  {0pt}% after
+\setcounter{secnumdepth}{-1}
+\parindent=0in
+
+
+% expressions should end at column 46
+\begin{document}
+\centerline{\large\bf PGFPLOTS Cheat Sheet for Calculus-type graphs}
+\begin{multicols}{3}
+\begin{basic}
+\section{Basic environments}
+Setup 
+\begin{latex}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\end{latex}
+
+Basic command
+\begin{latex}
+\begin{tikzpicture}["<options>"]
+\begin{axis}["<options>"]
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{basic}
+
+\section{Addplot}
+\begin{latex}
+\addplot coordinates {"<coordinate list>"};
+\addplot table ["<column selection">]{"<table>"};
+\addplot {"<math expression>"};
+\addplot[variable = t] ( {"<math>"}, {"<math>"} );
+\end{latex}
+
+Coordinate list example:
+\begin{latex}
+{(1,2) (10,12) (25,30)}
+\end{latex}
+
+Inline table example
+\begin{latex}
+{
+1 1
+2 4
+3 9
+}; %  must be by itself on last line
+\end{latex}
+
+Math expression example
+\begin{latex}
+\addplot{e^{-x^2}};
+\end{latex}
+
+\section{Coordinates}
+Cartesian coordinates
+\begin{latex}
+(length1,length2)
+\end{latex}
+
+Polar coordinates
+\begin{latex}
+(angle:length)
+\end{latex}
+
+Coordinate math expression examples:\\
+"(pi/2, {sin(pi/2)})" \quad or \quad "(1e6, 2e7)"
+
+\begin{basic}
+\section{Tikz commands}
+Straight line
+\begin{latex}
+\draw "<coord>" -- "<coord>";
+\end{latex}
+
+Curve
+\begin{latex}[xleftmargin=0pt]
+\draw[out="<angle>",in="<angle>"] "<coord>" to "<coord>";
+\end{latex}
+
+Relative positions 
+\begin{latex}
+\draw "<coord>" -- ++ "<coord>";
+\end{latex}
+
+Circle
+\begin{latex}
+\draw "<coord>" circle ("<dim>");
+\end{latex}
+
+\begingroup \lstset{literate=<{<}{1} >{>}{1}}
+Arrows Example\\
+\begin{minipage}{1.8in}
+\begin{latex}[xleftmargin=0in,belowskip=0pt]
+\draw[<->] (0,0) -- (1,0);
+\end{latex}
+\end{minipage}
+\qquad \tikz[<->] \draw (0,0) -- (1,0);\\
+(Can add "<" and/or ">" and/or "|" to "-")
+\endgroup
+\medskip
+
+Nodes:
+\begin{latex}
+\draw "<coord>" node["options"] {"<contents>"};
+\end{latex}
+
+Node options:
+\begin{latex}[deletekeywords={draw}]
+left|right|above|below|above left|"<etc">
+pos = "<percent>"
+draw % draws boundary of node
+circle % changes boundary to circle
+inner sep = "<dim>"
+text width = "<dim>"
+\end{latex}
+
+Font example
+\begin{latex}
+\begin{tikzpicture}[font={\small\bfseries}]
+\end{latex}
+\end{basic}
+
+\section{Options for \code{axis}}
+Box, $x$-axis, $y$-axis, etc
+\begin{latex}
+axis lines=box|left|middle|center|right|none
+axis x line=box|top|middle|center|bottom|none
+axis y line=box|left|middle|center|right|none
+\end{latex}
+
+Labels
+\begin{latex}
+xlabel = "<text>", ylabel = "<text>"
+\end{latex}
+
+Title
+\begin{latex}
+title = "<text>"
+\end{latex}
+
+Ticks
+\begin{latex}[belowskip=0pt]
+ticks = minor|major|both|none
+xtick = \empty|"<number list>"
+ytick = \empty|"<number list>"
+xtick distance = "<dim>" % dist between ticks
+ytick distance = "<dim>"
+minor tick num = "<num>" % ticks between ticks
+xticklabels="<text list>"
+yticklabels="<text list>"
+\end{latex}
+(WARNING: "xticklabel" is an unrelated command)\medskip
+\columnbreak
+
+Grids
+\begin{latex}
+grid=minor|major|both|none 
+\end{latex}
+
+Ticklabel scale format
+\begin{latex}
+tick scale binop="<binary operator">
+\end{latex}
+%\vspace{-\medskipamount}
+
+\section{Axis external sizing options}
+Size styles
+\begin{itemize}
+\renewcommand{\labelitemi}{}
+\item "normalsize" :  \hfill \qty{8.4}{cm} $\times$  \qty{7.3}{cm} 
+          =  \qty{3.3}{in} $\times$ \qty{2.9}{in}
+\item "small" : \hfill \qty{6.50}{cm} $\times$ \qty{5.60}{cm} 
+         = \qty{2.52}{in} $\times$ \qty{2.20}in
+\item "footnotesize" :  \hfill \qty{5}{cm} $\times$ \qty{4.31}{cm} 
+       = \qty{1.97}{in} $\times$ \qty{1.70}{in}
+\item "tiny" : \hfill \qty{4}{cm} $\times$ \qty{3.45}{cm} 
+         = \qty{1.57}{in} $\times$ \qty{1.36}{in}
+\end{itemize}
+\medskip
+
+Setting width and height
+\begin{latex}
+\begin{axis}[width="<dim>", height = "<dim>"]
+\end{latex}
+
+Scaling whole image
+\begin{latex}
+\begin{tikzpicture}[scale=1.25] % visual mag
+\begin{axis}[scale=1.25] % logical mag
+\end{latex}
+
+Changing external aspect ratio
+\begin{latex}
+\begin{axis}[y post scale=2] % change height
+\begin{axis}[height=9cm]  % change height
+\end{latex}
+
+Clipping
+\begin{latex}
+clip = true|false
+clip mode = global|individual
+restrict y to domain = "<min>:<max>"
+\end{latex}
+
+\section{Axis internal sizing options}
+Setting internal limits
+\begin{latex}
+xmin = "<number>", xmax = "<number>", 
+ymin = "<number>", ymin = "<number>"
+\end{latex}
+
+Changing internal aspect ratio
+\begin{latex}
+\begin{axis}[axis equal]
+\begin{axis}[unit vector ratio = "<num>" "<num>"]
+\end{latex}
+% The latter makes the vertical and horizontal scales different: $1$ in
+% the horizontal direction is $20$ times longer visually than $1$ in the
+% vertical.  
+
+\section{Options for Addplot (mostly from Tikz)}
+Line thickness:
+\begin{latex}
+ultra thin|very thin|thin|semithick|thick
+   |very thick|ultra thick|linewidth="<dim>"
+\end{latex}
+% The first 7 of these produce lines of thickness 0.1pt, 0.2pt, 0.4pt,
+% 0.6pt, 0.8pt, 1.2pt, 1.6pt, respectively.\medskip
+
+Line style:
+\begin{latex}
+solid|dashed|dotted|dash dot|dash dot dot
+     |densely dashed|loosely dashed|"<etc>"
+\end{latex}
+
+Color Example:
+\begin{latex}[belowskip=0pt]
+red!50!black,ultra thick
+\end{latex}
+\vspace{-5pt}
+\tikz \draw[red!50!black,ultra thick] (0,0) -- (6,0);\medskip
+
+Line doubling example
+\begin{latex}[belowskip=0pt]
+double=white,thick
+\end{latex}
+\vspace{-5pt}
+\tikz\draw[double=white,thick] (0,0) -- (6,0);\medskip
+\columnbreak
+
+Line shape
+\begin{latex}
+sharp|smooth
+\end{latex}
+
+Where functions are evaluated
+\begin{latex}
+domain = "<max>:<min>"
+samples = "<whole number>" % num of values used
+samples at = {"<numbers>"} % manual override
+\end{latex}
+
+\section{Marks}
+\begin{latex}
+only marks % don't connect points
+marks = none 
+mark = *|+|x
+mark size = "<dim>"
+mark indices = {"<index list>"} % which points
+mark options = {"<style declarations>"}
+\end{latex}
+
+Style declarations example
+\begin{latex}
+mark options = {scale=2,thick,fill=white}
+\end{latex}
+
+\section{Math options}
+Setting trig functions in plot commands to use radians
+\begin{latex}
+trig format plots = rad
+\end{latex}
+
+Defining constant and function example:
+\begin{latex}[literate=<{<}{1} >{>}{1}]
+declare function = { a = 5; % <- semicolon!
+f(\x) = (\x-a)^2; % <- semicolon!
+} 
+\end{latex}
+
+% things I left out:
+% opacity 
+
+
+\section{Defining styles}
+Storing a style in a name
+\begin{latex}[xleftmargin=0pt]
+\pgfplotsset{duckplot/.style={thick,blue,smooth}}
+\addplot[duckplot]{x^2};
+\end{latex}
+
+Setting a style for whole document
+\begin{latex}
+\pgfplotsset{
+  every axis/.style = {axis lines = middle},
+  cycle list name = color list,
+  every axis plot/.style = {thick,smooth}
+  }
+\end{latex}
+
+\section{Externalize}
+\begin{latex}
+\usetikzlibrary{external}
+\tikzexternalize
+\tikzsetexternalprefix{tikzfigs/}
+\tikzsetnextfilename{3p5_example_1}
+\end{latex}
+
+Command line
+\begin{latex}[belowskip=0pt]
+pdflatex -shell-escape mainfile
+\end{latex}
+(Note: "mainfile" CANNOT have spaces in name)
+\end{multicols}
+
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

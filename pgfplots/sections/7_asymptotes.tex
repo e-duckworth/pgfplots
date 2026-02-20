@@ -1,0 +1,301 @@
+
+\section{Asymptotes}
+\label{section_asymptotes}
+\subsection{Basic approach}
+Pgfplots tries to auto-size the $y$-limits of the axis to fit the
+graph.  But this doesn't work well for asymptotes:
+\begin{minipage}{0.5\columnwidth}
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[axis lines = middle]
+\addplot[very thick, smooth, blue]{1/x};
+\end{axis}
+\end{tikzpicture}%
+\end{latex}
+\end{minipage}
+%
+\tikzcount
+\begin{tikzpicture}[baseline=(current bounding box.center)]
+\begin{axis}[axis lines = middle]
+\addplot[very thick, smooth, blue]{1/x};
+\end{axis}
+\end{tikzpicture}%
+
+The best way to fix this is to set "restrict y to domain": this will
+discard any $y$-value outside of the given range, and will set a key %
+"unbounded coords=jump" which prevents "pgfplots" from connecting the
+two sides.
+
+\noindent
+\begin{minipage}{0.5\columnwidth}
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[axis lines = middle,
+             "restrict y to domain =-5:5"]
+\addplot[very thick, smooth, blue]{1/x};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}%
+\hspace{0.5in}%
+\tikzcount
+\begin{tikzpicture}[baseline=(current bounding box.center)]
+\begin{axis}[axis lines = middle,restrict y to domain =-5:5]
+\addplot[very thick, smooth, blue]{1/x};
+\end{axis}
+\end{tikzpicture}
+
+We could make this graph a little better in two related ways.  First,
+you may note that the graph didn't get that close to $y=-5$ and $y=5$,
+which we were probably expecting given how we set %
+"restrict y to domain".  This is because with the default number of
+samples at 25, the middle three samples are
+$x\approx -0.4167$, $0$, $0.4167$.  The middle number evaluates to "inf",
+which is discarded, and the first and last evaluate to
+$\approx \pm 2.4$, which are plotted, but not that close to $\pm 5$.
+The second issue, which is a little hard to see and so may not matter
+much, is that the graph is relatively straight as it approaches the
+$y$-axis.  Increasing the number of samples will help both issues:
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[axis lines = middle,restrict y to domain =-5:5]
+\addplot[very thick, smooth, blue,"samples=51"]{1/x};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+%
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[axis lines = middle,restrict y to domain =-5:5]
+\addplot[very thick, smooth, blue,samples=51]{1/x};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+
+\subsection[Unexpected wiggles with \codex{smooth}]
+{Unexpected wiggles with \codex{smooth}}
+Asymptotes provide an example of how a curved graph is not always
+better with the "smooth" option turned on. 
+\begin{center}
+\begin{minipage}{.5\columnwidth}
+\begin{latex}[xleftmargin=0in]
+\begin{tikzpicture}
+\begin{axis}[small,
+   "mark options={mark size=1pt,color=red}"]
+\addplot[domain=0.1:10,thick,"smooth",
+      blue]{1/x^2};
+\addplot[domain=0.1:10,mark=*,
+                    only marks]{1/x^2};
+"\legend{smooth plot,samples}"
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}%
+\begin{minipage}{.5\columnwidth}
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[small,
+    "mark options={mark size=1pt,color=red}"]
+\addplot[domain=0.1:10,thick,
+          blue]{1/x^2};
+\addplot[domain=0.1:10,mark=*,
+        only marks]{1/x^2};
+"\legend{sharp plot,samples}"
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}
+\end{center}
+%
+
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small,mark options={mark size=1pt,color=red}]
+\addplot[domain=0.1:10,thick,smooth,blue]{1/x^2};
+\addplot[domain=0.1:10,mark=*,only marks]{1/x^2};
+\legend{smooth plot,samples}
+\end{axis}
+\end{tikzpicture}
+\hspace{1in}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small,mark options={mark size=1pt,color=red}]
+\addplot[domain=0.1:10,thick,blue]{1/x^2};
+\addplot[domain=0.1:10,mark=*,only marks]{1/x^2};
+\legend{sharp plot,samples}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+(Note: the only reason we have used two "\addplot" commands is to have
+the marks get a separate entry in the legend; otherwise, the %
+"mark options" could be combined with "mark = *" in a single
+"\addplot" to give us the same graph.)
+
+
+Both of these graphs look poor, but I'd say the first one looks
+worse.  The problem is that "pgfplots" (actually Tikz) is trying to make the
+slope on the second segment of this graph match the slope on the first
+segment, and that slope is aiming down below where the real graph
+should go.  In any case, both graphs are improved if we simply use
+more samples; I felt the "smooth" one needed a marginally
+\emph{greater} number of samples than the "sharp" graph, but the
+difference in number is probably not that significant.
+\begin{center}
+\begin{minipage}{.5\columnwidth}
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[small/
+\addplot[domain=0.1:10,thick,smooth
+      blue,"samples=80"]{1/x^2};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}%
+%
+\begin{minipage}{.5\columnwidth}
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[small]
+\addplot[domain=0.1:10,thick,
+          blue,"samples=70"]{1/x^2};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small]
+\addplot[domain=0.1:10,thick,smooth,samples=80,blue]{1/x^2};
+\end{axis}
+\end{tikzpicture}
+\hspace{1in}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small]
+\addplot[domain=0.1:10,thick,blue,samples=70]{1/x^2};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\subsection[Fine tuning \codex{ymin} etc.]
+{Fine tuning \codex{ymin} and \codex{ymax} versus
+  \codex{restrict y to domain}}
+
+There may be times you want to use "ymin" and "ymax" instead of %
+"restrict y to domain": the former options \emph{do} (with care)
+calculate the values outside of the indicated range and add them to
+the path, which will influence how the graph is shaped within the
+visible window
+
+\begingroup
+\small
+\noindent
+\begin{minipage}{0.333\columnwidth}
+\begin{latex}[xleftmargin=0in]
+\begin{tikzpicture}
+\begin{axis}[small,"ymax=4"]
+\addplot[domain=0.1:3,
+  thick,blue,samples=10,
+  mark=*]{1/x};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}%
+%
+\begin{minipage}{0.333\columnwidth}
+\begin{latex}[xleftmargin=0in]
+\begin{tikzpicture}
+\begin{axis}[small,
+  "axis lines = middle",
+  "xmin=0.25, ymax=4"]
+\addplot[domain=0.1:3,
+  thick,blue,samples=10,
+  mark=*]{1/x};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}%
+%
+\begin{minipage}{0.333\columnwidth}
+\begin{latex}[xleftmargin=0in]
+\begin{tikzpicture}
+\begin{axis}[small,
+  axis lines=middle,
+  "restrict y to domain = 0:4",
+  "xmin=0.25,ymax=4"]
+\addplot[domain=0.1:3,
+  thick,blue,samples=10,
+  mark=*]{1/x};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}
+\endgroup
+
+% output 
+
+\noindent
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small,ymax=4]
+\addplot[domain=0.1:3,
+  thick,blue,samples=10,
+  mark=*]{1/x};
+\end{axis}
+\end{tikzpicture}
+%
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small,
+axis lines = middle,
+xmin=0.25, ymax=4]
+\addplot[domain=0.1:3,thick,
+  blue,samples=10,mark=*]{1/x};
+\end{axis}
+\end{tikzpicture}
+%
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small,
+axis lines=middle, restrict y to
+  domain = 0:4,ymax=4,xmin=0.25]
+\addplot[domain=0.1:3,thick,
+  blue,samples=10,mark=*]{1/x};
+\end{axis}
+\end{tikzpicture}
+
+\noindent 
+All three graphs show only 9 of the 10 samples requested, but the
+first two also show the path extending off the edge of the axes, where
+the 10th sample point was calculated and added to the path.  By
+contrast, the graph with %
+"restrict y to domain" throws away the 10th sample point before
+"pgfplots" forms the whole path.  Somewhat strangely, the axis in the
+second graph doesn't operate exactly the same as in the first graph:
+we have to add either an "xmin" key or %
+"enlarge x limits" for the path to extend past the 9th sample.%
+\footnote{This is either a bug in \code{pgfplots}, or maybe just an
+  inconsistency.  With the axis setting of a box, there is an implicit
+  \code{enlargelimits}.  The fact that this expands the $x$-axis
+  allows the path to extend past the 9th point and towards the 10th
+  point.  We can verify this behavior by adding \code{enlargelimits =
+    false} to the box axis, and seeing that the path ends early, or by
+  adding \code{enlarge x limits} to the second axis instead of
+  changing the \code{xmin} value, and we'll still see the top of the
+  graph. By contrast, in the third graph, no change (other than
+  removing \code{restrict y to domain}) will allow us to see the path
+  continuing in the direction of the 10th sample point.}
+
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../pgfplots_tutorial"
+%%% End:

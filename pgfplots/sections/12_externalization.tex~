@@ -1,0 +1,104 @@
+\section{Breaking up and externalizing}
+\label{section_externalization}
+\subsection{Breaking up}
+Using "pgfplots" with lots of plots that have lots of points can slow
+a document down.  The oldest, most basic approach to improving a slow
+document is to break your document up into different parts and then,
+when you're editing and making lots of changes, just typeset one part
+at a time.  The standard way to do this is to use "\includeonly" and
+"\include", something like this
+\begin{latex}
+"\includeonly{section1}" % only section 1 will be typeset
+
+\begin{document}
+"\include{section1}"
+\include{section2}
+\include{section3}
+% etc.
+\end{document}
+\end{latex}
+When you're ready to produce the whole document, just put a comment
+symbol "%"
+in front of "\includeonly" and the whole document will be typeset.  I
+have done that for this document and it's helped a lot: this
+\emph{whole} document takes \qty{6.1}{s} but this section alone takes
+\qty{0.7}{s}.
+
+\subsection{Externalizing}
+Odds are you can skip this section unless you are making a document
+that is hundreds of pages and/or has hundreds of figures.  As
+mentioned in Section~\ref{section_pushing_limit}, speed can start
+to be an issue in using "pgfplots" if you have a document that has
+lots of figures and they have a large number of "samples".  In a
+program like Matlab you might not hesitate at all in running a plot
+with 300, or even 1000 points.  But TeX, after all, was written during
+1978--1990, uses fixed point arithmetic and was designed to calculate
+vertical and horizontal placement of boxes: it's not really designed
+to be fast at 1000 calculations of floating point numbers.
+
+\hypersetup{linkcolor=black} % turn off coloring links
+
+As an example, the current version of this document is
+\pageref{lastpage} pages, has \ref{lastpic}\ figures, and takes
+\qty{6.1}{s} on my current MacBook Air~(M4, 2026). At that rate it
+would take about \qty{2}{min} for a 1000 page book, which is probably
+too long to be convenient. But the PGF package includes a library
+(sub-package) written by the author of "pgfplots" that helps out.
+
+When one uses the "externalize" library this is what happens: When
+Tikz finds a "tikzpicture" environment it checks to see if it is new
+in that document, and/or if it has changed since the last time the
+document was typeset.  If so, it creates a temporary document that
+contains just that picture, typesets it, and saves the PDF that has
+just that picture.  Then it inserts that PDF into the main
+document. On subsequent typesetting runs, it checks again, and
+assuming nothing has changed in that picture, it simply inserts the
+PDF into the main document.  Thus, on subsequent runs, the amount of
+time needed is roughly just the same as a simple call to
+"\includegraphics".  This can represent a huge speed increase.  
+
+Here's an example of how I use it
+\begin{latex}
+% in preamble
+\usetikzlibrary{external}
+\tikzexternalize
+\tikzsetexternalprefix{tikzfigs/}
+
+% in main document
+\tikzsetnextfilename{3p5_example_1}
+\begin{tikzpicture}
+...
+\end{tikzpicture}
+\end{latex}
+Note that to activate "externalize" you need to do two things: 
+load "external", \emph{and} issue the "\tikzexternalize"
+command.  This way you can keep the package loaded, but comment out
+"\tikzexternalize" to turn off externalizing, and just run things like
+normal.  
+
+It's not necessary to use "\tikzsetexternalprefix" but it's a good
+idea, because it puts the files created by "external" in a separate
+folder. It's not necessary to use "\tikzsetnextfilename", without it
+the library will automatically create a file name for the external
+image, but this automatic feature is fragile in the sense that if you
+insert a new picture (or delete an old one) then the automatic file
+names are thrown off (they are named with a number like
+``picture_0''), and so I use "\tikzsetnextfilename" (actually I
+created my own shorter command name which is just an alias).  
+
+After doing the above you need to typeset the file with a command that
+has extra permissions; for Linux and MacOS systems one can use the
+following:
+\begin{latex}
+pdflatex -shell-escape mainfile
+\end{latex}
+(Warning: "mainfile" CANNOT have spaces in its name).  On subsequent
+runs you can use your usual typeset command.
+
+For further details the reader should refer to the Tikz/PGF
+user manual.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../pgfplots_tutorial"
+%%% End:

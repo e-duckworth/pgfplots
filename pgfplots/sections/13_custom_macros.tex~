@@ -1,0 +1,235 @@
+\section{Custom Macros}
+\label{section_custom_macros}
+Like in LaTeX more generally, you can create your own custom macros
+(i.e.\ commands) to make certain combinations of commands in
+"pgfplots" easier to use.  We've seen one version of this already with
+defining styles, but here we do something more complicated: create
+commands to automate typesetting real number lines.  Here's a
+demonstration of the commands:
+
+\begingroup
+\lstset{basicstyle=\small\tt\color{blue!75!black}}
+\begin{minipage}{0.45\columnwidth}
+\begin{latex}
+\begin{numline}[small]
+\interval{7}{10}{o}{o};
+\end{numline}
+\end{latex}
+\end{minipage}
+%
+\tikzcount
+\begin{numline}[small]
+\interval{7}{10}{o}{o};
+\end{numline}
+
+\begin{minipage}{0.45\columnwidth}
+\begin{latex}
+\begin{numline}[small,xtick={7,10}]
+\interval{7}{9}{o}{o};
+\end{numline}
+\end{latex}
+\end{minipage}
+%
+\tikzcount
+\begin{numline}[small,xtick={7,10}]
+\interval{7}{10}{o}{o};
+\end{numline}
+
+
+\begin{minipage}{0.45\columnwidth}
+\begin{latex}
+\begin{numline}[small]
+\interval{7}{9}{o}{o};
+\interval{11}{15}{c}{o};
+\end{numline}
+\end{latex}
+\end{minipage}
+%
+\tikzcount
+\begin{numline}[small]
+\interval{7}{9}{o}{o};
+\interval{11}{15}{c}{o};
+\end{numline}
+
+\begin{minipage}{0.45\columnwidth}
+\begin{latex}
+\begin{numline}[small,
+     xtick={7,9,...,15}]
+\interval{7}{9}{o}{o};
+\interval{11}{15}{c}{o};
+\end{numline}
+\end{latex}
+\end{minipage}
+%
+\tikzcount
+\begin{numline}[small,xtick={7,9,...,15}]
+\interval{7}{9}{o}{o};
+\interval{11}{15}{c}{o};
+\end{numline}
+
+
+\begin{minipage}{0.45\columnwidth}
+\begin{latex}
+\begin{numline}
+\interval{2}{4}{o}{o};
+\interval{6}{8}{c}{o};
+\interval{-1.5}{1}{<}{o};
+\interval{9}{12}{c}{>};
+\end{numline}
+\end{latex}
+\end{minipage}
+%
+\tikzcount
+\begin{numline}
+\interval{2}{4}{o}{o};
+\interval{6}{8}{c}{o};
+\interval{-1.5}{1}{<}{o};
+\interval{9}{12}{c}{>};
+\end{numline}
+
+\begin{minipage}{0.45\columnwidth}
+\begin{latex}
+\begin{numline}[xtick={1,2,4,6,8,9}]
+\interval[red]{2}{4}{o}{o};
+\interval{6}{8}{c}{o};
+\interval{-1.5}{1}{<}{o};
+\interval{9}{12}{c}{>};
+\end{numline}
+\end{latex}
+\end{minipage}
+%
+\tikzcount
+\begin{numline}[xtick={1,2,4,6,8,9}]
+\interval[red]{2}{4}{o}{o};
+\interval{6}{8}{c}{o};
+\interval{-1.5}{1}{<}{o};
+\interval{9}{12}{c}{>};
+\end{numline}
+\endgroup 
+
+You can see that often the code takes care of everything you
+might need, but sometimes you'll want to adjust the tick marks, or
+change colors, etc.  You can pass the usual options to "numline" that
+you would otherwise pass to "axis", and you can pass options to
+"\interval" that you would otherwise pass to "\addplot".
+
+In fact, "\begin{numline}" equals %
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}
+\end{latex}
+with some additional optional settings of the same kind that we used
+for number lines in Section~\ref{section_marking_points_pw}.
+
+The command
+\begin{flushleft}
+\noindent"\interval"\meta{num1}\meta{num2}\meta{opt1}\meta{opt2}";"
+\end{flushleft}
+means this: the interval is drawn between \meta{num1} and
+\meta{num2}; the ends are marked with \tikz\draw[very thick,blue]
+circle(2pt); or \tikz\draw[very thick,blue,fill=blue] circle(2pt); or
+\tikz[baseline=-2.5pt]\draw[very thick,blue,->] (0,0)--(5pt,0); or
+\tikz[baseline=-2.5pt]\draw[very thick,blue,<-] (0,0)--(5pt,0);
+according as \meta{opt1} and \meta{opt2} are ``o'', ``c'', ``$>$'' or
+``$<$'' respectively (where \meta{opt1} determines the mark at
+\meta{num1}, and \meta{opt2} for \meta{num2}).
+
+Note: the commands are somewhat smart, but one thing they don't do
+(yet?) is automatically make the %
+\tikz[baseline=-2.5pt]\draw[very thick,blue,->] (0,0)--(5pt,0); %
+or %
+\tikz[baseline=-2.5pt]\draw[very thick,blue,<-] (0,0)--(5pt,0); %
+long enough so that it's guaranteed to extend past the end of the
+$x$-axis, so sometimes you'll need to adjust the number you have that
+marks ``where infinity ends'' i.e.\ where %
+\tikz[baseline=-2.5pt]\draw[ very thick,blue,->] (0,0)--(5pt,0); or
+\tikz[baseline=-2.5pt]\draw[very thick,blue,<-] (0,0)--(5pt,0); is
+located.
+% maybe I could do away with this by somehow adding something like 
+% "every axis post/.style ={enlarge limits = false}" to the the plot,
+% but I haven't gotten that to work.  
+
+To define these commands I needed some fancier code: some more
+detailed settings from "pgfplots" and some internal \TeX\ control
+commands.  You should feel free to skip reading the definitions
+of these commands (unless this is your kind of thing!).
+
+\begingroup
+
+Here is the code for "numline"
+\begin{latex}[numbers=left]
+\newenvironment{numline}[1][]
+{
+  \begin{tikzpicture}[>=stealth]
+  \begin{axis}[axis y line = none,
+    axis lines= middle,
+    enlarge x limits=0.3,
+    "scatter/classes={
+        o={mark=*,fill=white},
+        c={mark=*} % <- no comma here
+    }",
+    clip = false, % false so infinite intervals can extend past end
+    enlarge x limits = 0.3,
+    "every inner x axis line/.append style = {-}",
+    "hide obscured x ticks = false",
+    #1]
+}
+{
+\end{axis}
+\end{tikzpicture}
+}
+\end{latex}
+Lines 7--10 define a class of points for use in a ``scatter plot''
+(which is what we'll use for the intervals).  Line 13 redefines the
+style for the $x$-axis so that it does not end with an arrow.  Line 14
+is used so that we can make a tickmark at $x=0$ (ordinarily "pgfplots"
+would hide a tick mark here because ordinarily the $y$-axis would be
+there).  Finally, "#1" in line 15 is how we pass options from
+"numline" back to "axis".\bigskip
+
+The code for "\interval" is here
+\begin{latex}
+\newcommand{\interval}[5][] {
+ \ifx #4< 
+    \ifx #5> % line <->
+        \errmessage{ERROR: The interval <-> is not defined in this command}
+    \else % line <- 
+        \addplot[very thick,blue,"scatter", "scatter
+        src = explicit symbolic",#1] coordinates {(#3,0) [#5]};
+        \draw[very thick,<-,blue] (#2,0) -- (#3,0);
+    \fi                           
+ \else                                     
+    \ifx #5> % line ->
+        \addplot[very thick, blue,scatter, scatter src
+        = explicit symbolic,#1] coordinates { (#2,0) [#4]};
+        \draw[very thick,->,blue] (#2,0) -- (#3,0);
+    \else % - line
+        \addplot[very thick, blue,scatter, scatter src
+        = explicit symbolic,#1] coordinates { (#2,0) [#4] (#3,0) [#5]};
+    \fi
+\fi
+}
+\end{latex}
+\begin{sloppypar}
+  The commands "\ifx ... \else ... \fi" are if-then-else statements
+  and are not part of "pgfplots"; they are part of \TeX, i.e.\ the
+  original basic program, and so I won't attempt to describe them
+  further.  The new parts for us are the options in "\addplots".  The
+  option "scatter" creates a scatter plot, which doesn't do much in
+  this case except allow us to define classes of different types of
+  points, i.e.\ the classes labeled ``c'' and ``o''.  The option %
+  "scatter src = explicit symbolic" tells "pgfplots" that the points
+  will be given explicitly, and the classes for each marker will
+  identified symbolically, meaning by the symbols ``c'' and ``o''.%
+  \footnote{In theory it would be nice to have ``$<$'' and ``$>$''
+    also treated as labels for classes in the scatter plot. But adding
+    an arrow head to a path is not as simple as marking a point: Tikz
+    has to change exactly how the line is drawn as it hits the arrow
+    head.}
+\end{sloppypar}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../pgfplots_tutorial"
+%%% End:

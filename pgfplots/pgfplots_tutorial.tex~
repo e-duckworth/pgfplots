@@ -1,0 +1,192 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{calc}
+\usepackage{stix2}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{spy}
+
+\fboxsep=0pt
+
+\usepackage{pdfpages}
+
+
+\usepackage{amsrefs}
+
+\usepackage{listings}
+
+
+\lstset{
+basicstyle=\color{blue!75!black}\fontsize{11pt}{11pt}\tt,% scaled \tt up by 10%
+columns=flexible, % prevents the extra space between letters
+}
+
+\lstMakeShortInline"
+% for marking short code in footnotes (where "..." doesn't work)
+\usepackage{relsize}
+\newcommand{\code}[1]{\textscale{1.1}{\texttt{\textcolor{blue!75!black}{#1}}}}
+% for marking short code in section titles, where \code{...} doesn't work.
+\newcommand{\codex}[1]{\texttt{\textcolor{blue!75!black}{#1}}}
+
+
+\lstnewenvironment{latex}[1][]{\lstset{language=[LaTeX]TeX,
+xleftmargin=12pt,
+keepspaces=true,
+basicstyle=\color{blue!75!black}\fontsize{11pt}{11pt}\tt,% scaled \tt up by 10%
+columns=flexible, % prevents the extra space between letters
+commentstyle=\color{green!65!black},
+moredelim=[is][\color{red!85!black}]{"}{"},
+numberstyle={\small\color{black}},
+#1}
+}{}
+
+
+
+\newcounter{tikzpics}
+
+\ifcase 1
+% case 0
+\newcommand{\tikzcount}{\stepcounter{tikzpics}
+  \marginpar{\textcolor{green!75!black}{\bf\fboxsep=5pt  
+  \fbox{tikz \#\arabic{tikzpics}}}}}
+\or % case 1
+\newcommand{\tikzcount}{\stepcounter{tikzpics}}
+\fi 
+
+
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\inv}{^{-1}}
+
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+
+
+
+\newcommand{\meta}[1]{$\langle$\textcolor{gray}{\itshape #1}$\rangle$}
+
+% environment to contain number line
+\newenvironment{numline}[1][]{\begin{tikzpicture}[>=stealth]
+\begin{axis}[axis y line = none,
+axis lines= middle,
+enlarge x limits=0.3,
+scatter/classes={
+        o={mark=*,fill=white},
+        c={mark=*} % <- no comma here
+    },
+clip = false, % false so infinite intervals can extend past end
+enlarge x limits = 0.3,
+every inner x axis line/.append style = {-},
+hide obscured x ticks = false,
+#1]}
+{\end{axis}
+\end{tikzpicture}}
+
+
+% The command below creates the graph of any kind of interval, open or
+% closed, finite or infinite, though we exclude the case
+% (-\infty,\infty) as an option.  We indicate infinity with an arrow
+% in the drawing, so we use nested if statements to test for > or <,
+% and otherwise pass the arguments "o" or "c" to the plot.  The nested
+% if statments have this form
+% \if < 
+%         \if > 
+%           make error for <-> 
+%         \else 
+%           make <- line
+%         \fi
+%   \else
+%        \if > 
+%           make -> line 
+%         \else
+%           make - line
+%        \f
+% \fi
+        
+
+% If we label mandatory arguments as #1,#2,#3,#4 then 
+% #1 and #2 = x-vals
+% #3 and #4 = o (open) or c (closed) or < or >
+\newcommand{\interval}[5][] {
+ \ifx #4< 
+    \ifx #5> % line <->
+        \errmessage{ERROR: The interval <-> is not defined in this command}
+    \else % line <- 
+        \addplot[very thick,blue,scatter, scatter
+        src = explicit symbolic] coordinates {(#3,0) [#5]};
+        \draw[very thick,<-,blue] (#2,0) -- (#3,0);
+    \fi                           
+ \else                                     
+    \ifx #5> % line ->
+        \addplot[very thick, blue,scatter, scatter src
+        = explicit symbolic,#1] coordinates { (#2,0) [#4]};
+        \draw[very thick,->,blue] (#2,0) -- (#3,0);
+    \else % - line
+        \addplot[very thick, blue,scatter, scatter src
+        = explicit symbolic,#1] coordinates { (#2,0) [#4] (#3,0) [#5]};
+    \fi
+\fi
+}
+
+
+
+
+% for the final draft, remove the includes and just input the stuff. 
+\let\include=\input
+
+
+\includeonly{
+% sections/1_example,
+% sections/2_tikz_option_keys,
+% sections/3_creating_settings,
+% sections/4_sizing_axes,
+% sections/5_axis_lines,
+% sections/6_marking_points_piecewise,
+% sections/7_asymptotes,
+% sections/8_parametric,
+% sections/9_math_expressions,
+% sections/11_pushing_limit,
+% sections/13_custom_macros,
+% sections/12_externalization,
+% sections/endmatter,
+}
+
+
+\begin{document}
+\begin{center}
+{\Large \bf PGFPLOTS Intro and Tutorial}\\[0.125in]
+ W. Ethan Duckworth \copyright 2026
+\end{center}
+\vspace{0.25in}
+
+This ``Intro and Tutorial'' is focused on how to create graphs of the
+sort you see in a Calculus textbook. It is relatively brief and leaves
+out many options: Everything here, and much much more, can be found in
+the \href{https://ctan.org/pkg/pgfplots}{pgfplots manual}.
+
+\vspace{0.5in}
+\tableofcontents
+
+\newpage
+
+\include{sections/1_example}
+\include{sections/2_tikz_option_keys}
+\include{sections/3_creating_settings}
+\include{sections/4_sizing_axes}
+\include{sections/5_axis_lines}
+\include{sections/6_marking_points_piecewise}
+\include{sections/7_asymptotes}
+\include{sections/8_parametric}
+\include{sections/9_math_expressions}
+\include{sections/11_pushing_limit}
+\include{sections/13_custom_macros}
+\include{sections/12_externalization}
+\include{sections/endmatter}
+
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

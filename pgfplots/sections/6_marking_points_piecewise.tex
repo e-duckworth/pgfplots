@@ -1,0 +1,295 @@
+\section{Marking points and piecewise functions}
+\label{section_marking_points_pw}
+\subsection{Basic Piecewise graph}
+Making a piecewise function is as easy as using more than one
+"\addplot" command.  
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[axis lines = middle]
+\addplot[thick,blue,domain=-5:-2]{-x+7};
+\addplot[thick,blue,domain=-2:1]{2*x+1};
+\addplot[thick,blue,domain=1:5]{(x-1)^2+1};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+%
+\tikzcount
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[axis lines = middle]
+\addplot[thick,blue,domain=-5:-2]{-x+7};
+\addplot[thick,blue,domain=-2:1]{2*x+1};
+\addplot[thick,blue,domain=1:4.5]{(x-1)^2+1};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\subsection{Marking a single point at a time}
+It's customary in textbooks to mark the ends of the pieces in a graph
+like the one above with either open or closed circles, which we'll do
+with the "mark" key.  We'll add marks in two ways: inside the same
+"\addplot" command that creates the graph of the function, and outside
+of this in a separate "\addplot" command.
+
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[axis lines = middle]
+\addplot[thick,blue,domain=-5:-2,mark = *, "mark indices={1,25}"]{-x+7};
+\addplot[thick,blue,domain=-2:1,mark = *, mark indices=25]{2*x+1};
+\addplot[thick,blue,domain=1:4.5,mark = *, mark indices=25]{(x-1)^2+1};
+\addplot[thick,blue,only marks,"fill=white"] "coordinates {(-2,-3) (1,1)}";
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+%
+\tikzcount
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[axis lines = middle]
+\addplot[thick,blue,domain=-5:-2,mark = *, mark indices={1,25}]{-x+7};
+\addplot[thick,blue,domain=-2:1,mark = *, mark indices=25]{2*x+1};
+\addplot[thick,blue,domain=1:4.5,mark = *, mark indices=25]{(x-1)^2+1};
+\addplot[thick,blue,only marks,fill=white] coordinates {(-2,-3) (1,1)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+Here's how "mark indices" works: if a function is sampled (calculated)
+at $x_1$, $x_2$, \dots, then the index for point $x_i$ is $i$.  Recall
+also that the default number of samples is 25, so %
+"mark indices = {1,25}" in the example above marks the 1st point and
+last point of the graph.
+
+The command "coordinates" expects a list of ordered pairs.  The
+command "fill = white" fills the current path, which in the example
+above is just the marks for the coordinate list.  (Warning: in this
+case "fill = white" just filled the marks, but if you include it in the
+original "\addplot" command, it might work the way you want, but it
+might fill more than you want (see the example at the end of the next
+subsection)\,).
+
+
+\subsection{Marking multiple points}
+You may want to mark multiple points on a single graph, and odds are
+this will be easier to do by adding a separate "\addplot" command.
+Suppose you want to mark the $x$- and $y$-intercepts, and the
+max/mins, and the inflection point on the following cubic:
+$f(x) = -2.124x^{3}+7.561x^{2}-4.433x-1.776$.  I'll assume that we
+have calculated their locations already at
+$x \in \{ -0.2684, 0.3426, 1.1731, 1.1866, 2.0306, 2.6551\}$.  It
+would be nice to be able to using a single "\addplot" command to graph
+this cubic and to mark these specific points, but this is not easily
+possible because we would have to create a list for %
+"samples at" then included these points, and 10--20 others, and then
+use %
+"mark indices" to select those we want to mark.  Instead we'll create
+a duplicate "\addplot" command, %
+use "only marks" and copy and paste the function expression into the
+second "\addplot".%
+\footnote{I requested a feature in the Tikz Github that would have
+  given an easy alternative to this, but it was denied as being
+  superfluous. It would have been something like a key for \code{marks
+    at = ...}  which would have worked like \code{samples at = ...},
+  i.e.\ it would override, for marks alone, any other mark settings or
+  samples and just place marks at the indicated values.}  %
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[axis lines = middle]
+\addplot[thick,smooth,blue,domain = -0.7:3.1]
+     {-2.124*x^3 + 7.561*x^2 - 4.433*x - 1.776};
+\addplot[thick,smooth,blue,only marks, 
+   "samples at" = {-0.2684, 0, 0.3426, 1.1731, 1.1866, 2.0306, 2.6551}]
+     {-2.124*x^3 + 7.561*x^2 - 4.433*x - 1.776};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+%
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[axis lines = middle]
+\addplot[thick,smooth,blue,domain = -0.7:3.1]
+     {-2.124*x^3 + 7.561*x^2 - 4.433*x - 1.776};
+\addplot[thick,smooth,blue,only marks, 
+   samples at = {-0.2684, 0, 0.3426, 1.1731, 1.1866, 2.0306, 2.6551}]
+     {-2.124*x^3 + 7.561*x^2 - 4.433*x - 1.776};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+We close this subsection with examples that shows two minor
+variations on the above methods.  Suppose we have just a single graph
+and want to mark just a single open point at the end of the graph.  We
+might be able to do this just by adding "fill = white" in the
+"\addplot" command
+
+\noindent \begin{minipage}{0.5\columnwidth}
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[small,axis lines=middle]
+\addplot[thick,blue,fill=white,mark=*,
+              mark indices = 25]{x};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}
+%
+\tikzcount
+\begin{tikzpicture}[baseline=(current bounding box.center)]
+\begin{axis}[small,axis lines=middle]
+\addplot[thick,blue,fill=white,mark=*,mark indices = 25]{x};
+\end{axis}
+\end{tikzpicture}
+
+But this use of "fill" applies not just to the mark, it also applies to
+the whole path, which sometimes leads to undesired results
+
+\noindent\begin{minipage}{0.6\textwidth}
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[grid,axis lines = middle]
+\addplot[thick,blue,smooth,mark=*,
+       mark indices = 1,fill=white] {x^2-x};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}
+%
+\hfill
+\tikzcount
+\begin{tikzpicture}[baseline=(current bounding box.center)]
+\begin{axis}[grid,axis lines = middle]
+\addplot[thick,blue,smooth,mark=*,
+            mark indices = 1,fill=white] {x^2-x};
+\end{axis}
+\end{tikzpicture}
+
+There are two solutions here: make the "fill = white" only apply to
+the mark, or use a separate "\addplot" command, but since it's just
+one point, there's a shortcut available:
+
+\noindent
+\begin{minipage}{0.5\columnwidth}
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[small,grid,
+  axis lines = middle]
+\addplot[thick,blue,smooth,mark=*,
+   mark indices = 1,
+   "mark options={fill=white}"]
+   {x^2-x};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}
+\begin{minipage}{0.5\columnwidth}
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[small,grid,axis lines = middle]
+\addplot[thick,blue,smooth] {x^2-x};
+\addplot[thick,blue,mark=*,fill=white] "(-5,30)";
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}
+
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small,grid,axis lines = middle]
+\addplot[thick,blue,smooth,mark=*,mark indices = 1,mark options={fill=white}] {x^2-x};
+\end{axis}
+\end{tikzpicture}
+\hspace{1in}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small,grid,axis lines = middle]
+\addplot[thick,blue,smooth] {x^2-x};
+\addplot[thick,blue,mark=*,fill=white] (-5,30);
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+
+\subsection{Intervals on the number line}
+We can use the some of the same steps as above to graph intervals on
+the real number line.
+
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}["axis y line = none", axis lines= middle,
+"enlarge x limits=0.3"]
+\addplot[very thick, blue,mark=*] coordinates {(7,0) (10,0)};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+%
+\tikzcount
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[axis y line = none,axis lines= middle,
+enlarge x limits=0.3]
+\addplot[very thick, blue,mark=*] coordinates {(7,0) (10,0)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+The command "enlarge x limits=0.3" expands the limits of the $x$-axis by
+30\% past what it would be otherwise (which would end very near $7$
+and $10$).
+
+Here is a more complicated example
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[axis y line = none,axis lines= middle,
+"enlarge x limits={lower=0.3}",
+"every inner x axis line/.append style = {-}",
+"hide obscured x ticks = false",
+"typeset ticklabels with strut",
+xtick={0,1,2.5,3.25,4},
+xticklabels={$a$, $b$, $c$, $d$, $e$}
+]
+\addplot[very thick, blue] coordinates {(1,0) (3.25,0)};
+\addplot[very thick, blue,->] coordinates {(4,0) (6,0)};
+\addplot[very thick, blue, only marks] coordinates {(0,0) (1,0) (4,0)};
+\addplot[very thick, blue, only marks,fill=white] coordinates {(2.5,0) (3.25,0)};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+%
+\tikzcount
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[axis y line = none,axis lines= middle,
+enlarge x limits={lower=0.3},
+every inner x axis line/.append style = {-},
+hide obscured x ticks = false, xtick={0,1,2.5,3.25,4},
+typeset ticklabels with strut, 
+xticklabels={$a$, $b$, $c$, $d$, $e$}
+]
+\addplot[very thick, blue] coordinates {(1,0) (3.25,0)};
+\addplot[very thick, blue,->] coordinates {(4,0) (6,0)};
+\addplot[very thick, blue, only marks] coordinates {(0,0) (1,0) (4,0)};
+\addplot[very thick, blue, only marks,fill=white] coordinates {(2.5,0) (3.25,0)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\begin{itemize}
+\item[] "enlarge x limits={lower=0.3}"\quad expands the axis beyond the points
+we've plotted, but only at the lower end.
+\item[] "every inner x axis line/.append style = {-}"\quad causes the
+  $x$-axis to \emph{not} have an arrow head (because we'll add that
+  with the thick blue line)
+\item[] "hide obscured x ticks = false"\quad allows for the tick mark at $0$
+  to be shown (usually "pgfplots" hides tick marks at $0$ because
+  usually there is a $y$-axis there!)
+\item[] "typeset ticklabels with strut"\quad causes all the labels for the
+  tick marks to be aligned along the implied baseline of these letters
+  (otherwise they appear to drift up and down)
+\end{itemize}
+Note: in Section~\ref{section_custom_macros} we define some commands
+that make it much easier to create a number line like this. 
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../pgfplots_tutorial"
+%%% End:

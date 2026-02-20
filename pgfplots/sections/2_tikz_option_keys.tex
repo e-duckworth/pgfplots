@@ -1,0 +1,179 @@
+
+\section{Tikz commands, options, and keys}
+"pgfplots" is built on top of Tikz, which has hundreds of commands for
+drawing things, and you can combine Tikz commands with "pgfplots" commands.
+\begin{latex}
+\begin{tikzpicture}
+  \begin{axis}[
+      axis lines=middle,
+      clip=false,ymax=20,
+      restrict y to domain=0:20
+      ]
+    \addplot[smooth,very thick,blue]{-x^2+15};
+"    \draw[red,thick] (0,15) circle (0.6cm);
+    \draw[red,thick,->] (2,18) node[above right]{Wow!} -- (0.75,16.5);"
+  \end{axis}
+\end{tikzpicture}
+\end{latex}
+%
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+  \begin{axis}[
+      axis lines=middle,
+      clip=false,ymax=20,
+      restrict y to domain=0:20
+      ]
+    \addplot[smooth,very thick,blue]{-x^2+15};
+
+    \draw[red,thick] (0,15) circle (0.6cm);
+    \draw[red,thick,->] (2,18) node[above right]{Wow!} -- (0.75,16.5);
+  \end{axis}
+\end{tikzpicture}
+\end{center}
+You can include any Tikz commands within the "axis" environment, and
+the coordinates used in that command will equal the numbers that
+"axis" is using (provided you are using a new enough version of
+"pgfplots" where any version since 1.11, released in 2014, is new
+enough).  In the example above, the circle is centered at the
+\emph{logical coordinate} (also called ``axis coordinate'') (0,~15)
+where the 0 and 15 equal the numbers shown in the axes.  Perhaps it
+seems obvious that it would work this way, but note: (1) There is a
+lot of scaling going on to turn the 15 on the $y$-axis above into an
+actual distance on the paper that is closer to 5cm.  (2) The numbers
+do \emph{not} match up that way if you put that same "\draw" command
+outside of "axis".  (3) The numbers do \emph{not} match up that way if
+you put ``cm'' after the coordinates (which is why we \emph{did} put
+``cm'' in the radius for the circle; this is a radius of a ``real''
+0.5 centimeters, not a radius of 0.5 in the coordinate system used in
+the axes.)  See the section on sizing axes for more about this
+distinction.
+
+In addition to adding Tikz commands inside of "axis" you can add Tikz
+options/keys to the "\addplot" command.  The following might be useful
+keys (some we've seen already)
+\begin{itemize}
+\item colors, for example "blue", "red", etc.  You can enter these
+  directly or as "color = blue", etc.
+
+\item line thicknesses: "ultra thin", "very thin", "thin",
+  "semithick", "thick", "very thick", "ultra thick", %
+"line width = "$\langle\text{\it dimension}\rangle$
+
+\item line styles: "dashed", "dotted" (both also have "loosely" and
+  "densely" varieties, like "densely dashed").  You can also create a
+  double line with "double"
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[axis lines = middle]
+  \addplot[very thick, "double =black, double distance = 1.5pt", 
+       smooth, green, domain=-1.5:0]{x^3-x}; 
+  \addplot[very thick, "double =black, double distance = 1.5pt," 
+       smooth, red,domain=0:1.5]{x^3-x};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+%
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[axis lines = middle]
+  \addplot[very thick, double =black, double distance = 1.5pt, 
+       smooth, green, domain=-1.5:0]{x^3-x}; 
+  \addplot[very thick, double =black, double distance = 1.5pt, 
+       smooth, red,domain=0:1.5]{x^3-x};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+
+\item Arrow tips and tails: "<", ">" and "|" can be put at either end, and
+  also stacked up:
+\begin{latex}
+\begin{tikzpicture}[yscale=0.5]
+\draw"[->]" (0,0) -- (1,0);
+\draw"[<->]" (0,-1) -- (1,-1);
+\draw"[>-|]" (0,-2) -- (1,-2);
+\draw"[|->>>]" (0,-3) -- (1,-3);
+\end{tikzpicture}
+\end{latex}
+%
+\begin{center}
+\tikzcount
+\begin{tikzpicture}[yscale=0.5]
+\draw[->] (0,0) -- (1,0);
+\draw[<->] (0,-1) -- (1,-1);
+\draw[>-|] (0,-2) -- (1,-2);
+\draw[|->>>] (0,-3) -- (1,-3);
+\end{tikzpicture}
+\end{center}
+Note that there are a \emph{huge} number of additional arrow tips and
+tails, but for many of these you'll need to load the "arrows.meta" package
+in Tikz.
+
+\item Bends: 
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[axis lines=middle, clip = false]
+\addplot[very thick,smooth,blue,domain=0:8]{(x-4)^2};
+\draw[->,"out = 225,in=75",very thick] 
+      (4,15) node[above right]{Wow!} "to" (0.1,16.1);
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+%
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[axis lines=middle, clip = false]
+\addplot[very thick,smooth,blue,domain=0:8]{(x-4)^2};
+\draw[->,out = 225,in=75,very thick] 
+      (4,15) node[above right]{Wow!} to (0.1,16.1);
+\end{axis}
+\end{tikzpicture}
+\end{center}
+Here "out" refers to what angle the path will make ``coming out'' of a
+point (in this case coming out of the point next to ``Wow!''), "in"
+refers to what angle the path will make ``coming in'' to a point (in
+this case the point $(0,15)$\,), and "to" replaces the more common
+"--" so instead of a straight line (which "--" makes), the path ``goes
+to'' the given point.
+
+
+\item plot expression options: Although we use the "\addplot" command,
+  which is part of the "pgfplots" package, the main thing it adds
+  compared to plain Tikz is automatic scaling of the final picture,
+  automatic options for the lines that show the axes, and automatic
+  options for tick marks, tick labels, labels, etc.  In particular,
+  most of the options we pass to "\addplot" are from Tikz, including
+  the following
+\begin{itemize}
+\renewcommand{\labelitemii}{$\circ$}
+\item "domain=5:10" will plot a formula using 25 $x$-values
+  starting at 5 and finishing at 10.
+
+\item "samples = 100" will change the number of $x$-values
+  used in the domain to 100.  
+
+\item "samples at = {5,7,9,15}" will cause the function formula to be
+  evaluated at $x=5$, $x=7$, $x=9$ and $x=15$.  It overrides the
+  "domain" and "samples" options.
+
+\item "coordinates = {(1,2) (3,4) (10,15)}" will make a plot through
+  the points $(1,2)$, $(3,4)$ and $(10,15)$.
+
+\item "only marks" means the plot will not connect points with a line
+  or curve, it will only make marks at each point.  
+
+\item "smooth" means the plot will make a smooth curve through the
+  points (where the points are either given in a coordinate list, or
+  by sampling a function).  
+
+\end{itemize}
+\end{itemize}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../pgfplots_tutorial"
+%%% End:

@@ -1,0 +1,81 @@
+\phantomsection
+  \addcontentsline{toc}{section}{Further Resources}
+
+\begin{bibdiv}
+\begin{biblist}
+\normalsize
+
+\bib{overleaf}{webpage}{
+ url={https://www.overleaf.com/learn/latex/Pgfplots_package},
+note = {Overleaf introduction to pgfplots},
+}
+
+\bib{hengxin}{webpage}{
+url =
+{https://github.com/hengxin/cheat-sheets/blob/master/latex/latex-pgfplots-cheat-sheet.md}, 
+note = {A short intro by a Github user},
+}
+
+\bib{underleaf}{webpage}{
+url =
+{https://www.underleaf.ai/learn/pgfplots/pgfplots-for-beginners},
+note = {Underleaf introduction to pgfplots},
+}
+
+\bib{useoctree}{webpage}{
+url = {https://www.useoctree.com/learn/pgfplots},
+note = {A company or organization webpage with a short intro},
+}
+
+\bib{kolda}{webpage}{
+url = {https://latex-graphics.com},
+author = {Kolda, Tamara},
+note = {A full length book about Tikz/PGF and PGFPLOTS},
+title = {Unlocking LaTeX Graphics}
+}
+
+\bib{kottwitz}{webpage}{
+url = {https://www.packtpub.com/en-us/product/latex-graphics-with-tikz-9781804618233},
+title = {LaTeX Graphics with Tikz},
+author = {Kottwitz, Stephen},
+note ={A full length book about LaTeX and Tikz},
+}
+
+\bib{moler}{webpage}{
+url = {https://www.mathworks.com/moler/index_ncm.html},
+author = {Moler, Cleve},
+title = {Numerical Computing with MATLAB},
+note = {A textbook in numerical computing, by Cleve Moler, the founder
+  of Matlab and Mathworks, the company that sells Matlab},
+}
+
+\bib{pgfplots}{webpage}{
+url = {https://ctan.org/pkg/pgfplots},
+author = {Feuersänger, Dr.\ Christian},
+title = {Manual for Package PGFPLOTS},
+note = {Definitive reference manual for PGFPLOTS},
+}
+
+
+\bib{pgf}{webpage}{
+url = {https://ctan.org/pkg/pgf},
+title = {Tikz \& PGF: Manual for Version 3.1.11a},
+author = {Tantau, Till}
+note = {Definitive reference manual for Tikz and PGF},
+}
+\end{biblist}
+\end{bibdiv}
+
+
+\addtocounter{tikzpics}{-1}
+\refstepcounter{tikzpics}
+\label{lastpic}
+\includepdf[landscape,
+pagecommand*={\phantomsection
+  \addcontentsline{toc}{section}{One page cheat-sheet}},
+pagecommand={\thispagestyle{empty}\label{lastpage}}]{sections/pgfplots_onepage}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../pgfplots_tutorial"
+%%% End:

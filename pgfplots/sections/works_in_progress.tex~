@@ -1,0 +1,130 @@
+\section{Works in progress}
+Experiment
+
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[trig format plots = rad,
+ymax=8,xmax=8,xmin=0,ymin=0,axis equal,
+width=7cm,height=7cm,restrict y to domain = 0:25]
+\addplot[domain=0:4,color1,smooth]{1/(x-1)^2};
+\addplot[very thick,domain={-pi/2}:{pi/2},variable=t,color2]
+     ({sec(t)-tan(t)+1},{(sec(t)+tan(t))^2});
+% \addplot[domain={-pi/2+0.7}:{pi/2-0.7},variable=t,color3]
+%      ({(sec(t)-tan(t))^2},{(sec(t)+tan(t))^2});
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+
+
+
+\begin{tikzpicture}
+\begin{axis}[small,axis lines =  middle, xlabel={$x$},
+  ylabel={$y$},xmin=-6,xmax=6,ymin=-10,ymax=10,
+minor x tick num=1,
+declare function = {
+f(\x) = 5*\x^2/(\x^4-3^4);
+eps=0.015;
+}]
+
+\begin{scope}[thick,smooth,blue]
+\addplot[domain=-6:{-3-eps}]{f(x)};
+\addplot[domain={-3+eps}:{3-eps}]{f(x)};
+\addplot[domain={3+eps}:6]{f(x)};
+\end{scope}
+\end{axis}
+\end{tikzpicture}
+
+
+\bigskip
+
+\pgfkeys{/pgf/fpu}%
+% according to Moler, p40, the code 
+% a = 4/3
+% b = a - 1
+% c = 3*b
+% e = 1 - c
+% used to be a way to estimate roundoff error (i.e. eps(1))
+\pgfmathparse{1-3*(4/3-1)}
+\pgfmathprintnumber{\pgfmathresult} % 1.02 e-5
+% in matlab eps(single(1)) = 1.2e-7
+% in matlab 1-3*(single(4/3)-1) = -1.2e-7
+\pgfkeys{/pgf/fpu=false}% earlier got an error without "resetting"
+                        % this?
+
+So the precision in PGF and pgfplots is a little worse than single
+precision.  
+
+The PGF manual says ``The FPU [the code that implements PGFPLOT's
+floating point calculations] has a uniform relative precision of about
+4–5 correct digits.''  Indeed, we can see this here:
+\begin{tikzpicture}
+\begin{axis}[nodes near coords]
+\pgfsetplotmarksize{2pt}
+\addplot coordinates{(0,{1-3*(4/3-1)})}
+   node[above=20pt]{$y=1-3(4/3-1)$};
+\end{axis}
+\end{tikzpicture}
+\bigskip
+
+
+
+
+\begin{tikzpicture}
+\begin{axis}[trig format plots=rad,restrict y to domain =-1:1]
+\addplot[blue,domain=-1:1,samples=200]{(1-cos(x))/x^2};
+\end{axis}
+\end{tikzpicture}
+
+Lua backend has increased accuracy for \emph{some} calculations (see
+p.534) enough so that some graphics will look different with lualatex
+than pdflatex.  But (experimentally) it produced no difference in the
+calcuations shown above.
+
+
+\bigskip
+
+
+\begin{tikzpicture}[only marks]
+\begin{axis}
+\addplot{x^2};
+\end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}[only marks,every mark/.style={scale=2}]
+\begin{axis}
+\addplot{x^2};
+\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[only marks]
+\begin{axis}
+\addplot[blue,mark=*,every mark/.style={scale=2}]{x^2};
+\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}[only marks,every mark/.style={line width=4pt}]
+\begin{axis}
+\addplot{x^2};
+\end{axis}
+\end{tikzpicture}
+
+
+\bigskip
+
+\begin{tikzpicture}[only marks,every mark/.style={scale=0.5}]
+\begin{axis}[title={scale=0.5}]
+\addplot{x^2};
+\end{axis}
+\end{tikzpicture}
+~
+\begin{tikzpicture}[only marks]
+\pgfsetplotmarksize{1pt}
+\begin{axis}[title = {pgfsetplotmarksize\{1pt\}}]
+\addplot{x^2};
+\end{axis}
+\end{tikzpicture}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../pgfplots_tutorial"
+%%% End:

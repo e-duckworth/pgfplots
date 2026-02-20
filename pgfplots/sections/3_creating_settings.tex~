@@ -1,0 +1,82 @@
+
+\section{Creating your own settings}
+I tend to want the same, or similar, settings on most plots, and
+"pgfplots" makes it easy to create and use these.  From the manual
+``Use "\pgfplotsset{"$\langle\emph{key}\rangle$%
+  "/.style = {"$\langle\emph{key-value-list}\rangle$"}}" to (re)define
+a style $\langle\emph{key}\rangle$ in the namespace "/pgfplots".''
+
+What this mean is you can do something like this:
+\begin{latex}
+% probably in preamble 
+"\pgfplotsset{
+  duckplot/.style={thick,blue,smooth},
+  duckaxis/.style={axis lines = middle, xlabel={$x$}, ylabel={$y$}}
+}"
+% in main document
+\begin{tikzpicture}
+\begin{axis}"[duckaxis]"
+\addplot"[duckplot]"{x^2};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+and then use that in plots
+\pgfplotsset{
+duckplot/.style={thick,blue,smooth},
+duckaxis/.style={axis lines = middle, xlabel={$x$}, ylabel={$y$}}
+}
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[duckaxis]
+\addplot[duckplot]{x^2};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+You can also change the default settings so you don't need to use
+options "duckaxis" and "duckplot" in the above commands.
+
+\begingroup
+\begin{latex}
+% probably in preamble
+\pgfplotsset{
+  "every axis/.style" = {axis lines = middle},
+  "cycle list name = color list",
+  "every axis plot/.style" = {thick,smooth}
+}
+
+% in main document
+\begin{tikzpicture}
+\begin{axis}[restrict y to domain = -5:20]
+\addplot{x^2};
+\addplot{-2*(x+1)+1};
+\addplot{2*(x-1)+1};
+\addplot{4*(x-2)+4};
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+% probably in preamble
+\pgfplotsset{every axis/.style = {axis lines = middle},
+cycle list name = color list,
+every axis plot/.style = {thick,smooth}}
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[restrict y to domain = -5:20]
+\addplot{x^2};
+\addplot{-2*(x+1)+1};
+\addplot{2*(x-1)+1};
+\addplot{4*(x-2)+4};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+\endgroup
+
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../pgfplots_tutorial"
+%%% End:

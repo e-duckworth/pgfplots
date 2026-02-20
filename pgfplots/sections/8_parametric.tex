@@ -1,0 +1,188 @@
+\section{Parametric}
+\subsection{Basic use of parametric}
+To make a parametric graph, use the "\addplot" command as follows: (1)
+change the variable to "t"; (2) Give it a math expression in two
+coordinates, i.e.\ put the functions in an ordered pair like this
+(\dots\ , \dots).
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[axis equal, "trig format plots = rad"]
+  \addplot[thick,smooth,blue,variable = t,
+  domain="0:2*pi",samples=100] 
+  "( {cos(t)+0.1*cos(10*t},  {sin(t)+0.1*sin(10*t)} )";
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+%
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[axis equal, trig format plots = rad]
+\addplot[thick,smooth,blue,variable = t, domain=0:2*pi,samples=100]
+     ( {cos(t)+0.1*cos(10*t)}, {sin(t)+0.1*sin(10*t} ) ;
+\end{axis}
+\end{tikzpicture}
+\end{center}
+In addition to the changes needed here for parametric mode, note we
+used ``"2*pi"'' for the domain (see more about this in
+Section~\ref{section_math_library}), and we ``forced'' the trig
+functions to be in radian mode.  The default in Tikz and "pgfplots" is
+to use degrees, because those seem more natural for drawing things
+(e.g.\ if you wanted to draw an angle of $25^\circ$), the option above
+changes that, but only for the expressions in "\addplot" commands.%
+\footnote{There is another way to make these functions work in radian
+  mode: there is a postfix operator \code{(...)r} that causes it's
+  argument to be interpreted as radians, so that we could have written
+  \code{cos((t)r)+0.1*cos((10*t)r)} etc.}
+
+
+\subsection{Avoiding problematic Cartesian calculations}
+We showed earlier, in Section~\ref{section_asymptotes}, that sometimes
+asymptotes don't graph as nicely as we might want using the "smooth"
+option combined with Cartesian calculations, i.e.\ graphing $y=f(x)$
+by evaluating at a list of $x$-values.  Sometimes this can be avoided
+by using parametric equations.  Looking at the graph below on the
+left, we can see that to avoid the erroneous wiggle we should have the
+$x$-values sampled much closer together near the $y$-axis.  One way to
+accomplish this is to replace $y=1/x^2$, $0.1\le x \le 10$ with
+$x=1/t$, $10 \ge t \ge 0.1$, $y=t^2$ (which gives the same graph).
+\begin{center}
+\small
+\begin{minipage}{.5\columnwidth}
+\begin{latex}[xleftmargin=0in]
+\begin{tikzpicture}
+\begin{axis}[small,
+   "mark options={mark size=1pt,color=red}"]
+\addplot[domain=0.1:10,thick,
+      smooth,blue]{1/x^2};
+\addplot[domain=0.1:10,mark=*,
+     only marks]{1/x^2};
+"\legend{cartesian plot,samples}"
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}%
+% 
+\begin{minipage}{.5\columnwidth}
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[small,
+     mark options={mark size=1pt,color=red}]
+\addplot[domain=0.1:10,thick,
+     blue,smooth,variable = t]"({1/t)}, {t^2})";
+\addplot[domain=0.1:10,mark=*, 
+        only marks, variable =t]"({1/t}, {t^2})";
+\legend{parametric plot,samples}
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}
+\end{center}
+
+%
+
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small,mark options={mark size=1pt,color=red}]
+\addplot[domain=0.1:10,thick,smooth,blue]{1/x^2};
+\addplot[domain=0.1:10,mark=*,only marks]{1/x^2};
+\legend{cartesian plot,samples}
+\end{axis}
+\end{tikzpicture}
+\hspace{1in}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small,mark options={mark size=1pt,color=red}]
+\addplot[domain=0.1:10,thick,blue,smooth,variable = t]({1/t)}, {t^2});
+\addplot[domain=0.1:10,mark=*, only marks, variable =t]({1/t}, {t^2});
+\legend{parametric plot,samples}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+(As in similar examples in Section~\ref{section_asymptotes}, we have
+used two "\addplot" commands simply to create two legend entries:
+otherwise, we could simply use the first "\addplot" command and
+include "mark=*" in it.  We will use just one "\addplot" in the
+remaining examples.)
+
+Note however two things about fixing the graphs of asymptotes in this
+way: (1) the appearance of the erroneous wiggle is a geometric
+property of the points that are calculated using the samples, which in
+turn depend on the domain used, the number of points sampled, and how
+those points are spread out.  In general, to prevent this problem we
+wish for more points ``near'' the asymptote.  (2) As a consequence,
+it's possible that some choices of parameterizing the Cartesian
+equation will work (in the sense of getting rid of the erroneous
+wiggle), some will work even better (in the sense of spreading the
+samples out) and some will simply reproduce the wiggle, but sideways:
+\begin{center}
+\small
+\begin{minipage}{.5\columnwidth}
+\begin{latex}[xleftmargin=0in]
+\begin{tikzpicture}
+\begin{axis}[small,mark options={mark
+    size=1pt,color=red}]
+\addplot[domain={1/sqrt(10)}:{1/sqrt(0.1)},
+   thick, mark=*,blue,smooth,variable = t]
+   "({1/t^2}, {t^4})";
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}%
+% 
+\begin{minipage}{.5\columnwidth}
+\begin{latex}
+\begin{tikzpicture}
+\begin{axis}[small,mark options={mark
+    size=1pt,color=red}]
+\addplot[domain=0.01:100,thick,
+   mark=*,blue,smooth,variable = t]
+   "({1/sqrt(t)}, {t})";
+\end{axis}
+\end{tikzpicture}
+\end{latex}
+\end{minipage}
+\end{center}
+
+\begin{center}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small,mark options={mark
+    size=1pt,color=red}]
+\addplot[domain={1/sqrt(10)}:{1/sqrt(0.1)},thick,
+   mark=*,blue,smooth,variable = t]({1/t^2}, {t^4});
+\end{axis}
+\end{tikzpicture}%
+\hspace{1in}
+\tikzcount
+\begin{tikzpicture}
+\begin{axis}[small,mark options={mark
+    size=1pt,color=red}]
+\addplot[domain=0.01:100,thick,
+   mark=*,blue,smooth,variable = t]({1/sqrt(t)}, {t});
+\end{axis}
+\end{tikzpicture}%
+% this does not work better 
+% \begin{tikzpicture}
+% \begin{axis}[small,mark options={mark size=1pt,color=red},
+% trig format plots = rad]
+% \addplot[domain=-1.3714:1.3714,thick,
+%    mark=*,blue,smooth,variable = t]({sec(t)-tan(t)}, {(sec(t)+tan(t))^2});
+% \end{axis}
+% \end{tikzpicture}
+\end{center}
+I suspect a good way to choose sample points would be to have them
+equally spaced along the curve.  This could be done easily if we could
+parameterize $y=1/x^2$ using arc-length, but unfortunately there is no
+elementary formula for this (as in, it's probably not possible using a
+closed form combination of elementary functions).  (Note: you can use
+something like $x=1/t^{10}$, $y=t^{20}$ and this is marginally better
+than $x=1/t^2$, $y=t^4$ shown above, but most of the points still
+cluster around the ``elbow'' of the graph.)
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../pgfplots_tutorial"
+%%% End:
